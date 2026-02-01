@@ -198,8 +198,8 @@ export class HumanCharacter {
             backpack.add(thruster);
         });
 
-        // Scale up the entire character to be more visible
-        this.body.scale.set(1.8, 1.8, 1.8);
+        // Scale character to normal size (GTA style - not too big)
+        this.body.scale.set(1.0, 1.0, 1.0);
 
         // Add idle floating animation
         gsap.to(this.body.position, {
@@ -266,12 +266,12 @@ export class HumanCharacter {
     }
 
     /**
-     * Update character position - NOW VISIBLE IN FRONT OF CAMERA
+     * Update character position - GTA STYLE third person
      */
     public update(cameraPosition: THREE.Vector3, cameraDirection: THREE.Vector3, isMoving: boolean): void {
-        // Position character IN FRONT of camera (so we can see it)
-        const offset = cameraDirection.clone().multiplyScalar(8); // 8 units in front
-        offset.y = -3; // Below eye level (on ground)
+        // GTA-style: Character further ahead, on the ground
+        const offset = cameraDirection.clone().multiplyScalar(15); // 15 units ahead
+        offset.y = -4; // Lower on ground
 
         this.targetPosition.copy(cameraPosition).add(offset);
 
