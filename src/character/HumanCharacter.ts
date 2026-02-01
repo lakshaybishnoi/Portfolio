@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { COLORS } from '../utils/constants';
 
 /**
- * Simple humanoid character that follows camera movement
+ * Improved humanoid character - bigger and more visible
  */
 export class HumanCharacter {
     public group: THREE.Group;
@@ -28,117 +28,187 @@ export class HumanCharacter {
         this.createCharacter();
         this.group.add(this.body);
 
-        // Start slightly behind camera position
-        this.group.position.set(0, 0, 25);
+        // Start at hero position
+        this.group.position.set(0, 0, 15);
     }
 
     /**
-     * Create the humanoid character with cyberpunk style
+     * Create the humanoid character - BIGGER and GLOWING
      */
     private createCharacter(): void {
-        // Materials with cyberpunk glow
+        // Glowing materials for visibility
         const bodyMaterial = new THREE.MeshBasicMaterial({
-            color: 0x222233,
+            color: 0x1a1a2e,
         });
 
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: COLORS.NEON_CYAN,
             transparent: true,
-            opacity: 0.9,
+            opacity: 1,
         });
 
         const accentMaterial = new THREE.MeshBasicMaterial({
             color: COLORS.NEON_MAGENTA,
         });
 
-        // Head - sphere with visor
-        const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
+        // ========== HEAD ==========
+        const headGeo = new THREE.SphereGeometry(0.5, 16, 16);
         this.head = new THREE.Mesh(headGeo, bodyMaterial);
-        this.head.position.y = 1.9;
+        this.head.position.y = 2.8;
         this.body.add(this.head);
 
-        // Visor (glowing stripe across face)
-        const visorGeo = new THREE.BoxGeometry(0.5, 0.1, 0.2);
+        // Visor - glowing stripe across face (bigger)
+        const visorGeo = new THREE.BoxGeometry(0.7, 0.15, 0.3);
         const visor = new THREE.Mesh(visorGeo, glowMaterial);
-        visor.position.set(0, 0, 0.25);
+        visor.position.set(0, 0, 0.35);
         this.head.add(visor);
 
-        // Torso
-        const torsoGeo = new THREE.BoxGeometry(0.6, 0.8, 0.3);
+        // Head glow ring
+        const headRingGeo = new THREE.TorusGeometry(0.55, 0.03, 8, 32);
+        const headRing = new THREE.Mesh(headRingGeo, glowMaterial);
+        headRing.rotation.x = Math.PI / 2;
+        headRing.position.y = -0.1;
+        this.head.add(headRing);
+
+        // ========== TORSO ==========
+        const torsoGeo = new THREE.BoxGeometry(0.9, 1.2, 0.5);
         this.torso = new THREE.Mesh(torsoGeo, bodyMaterial);
-        this.torso.position.y = 1.3;
+        this.torso.position.y = 1.8;
         this.body.add(this.torso);
 
-        // Chest light
-        const chestLightGeo = new THREE.BoxGeometry(0.15, 0.15, 0.05);
-        const chestLight = new THREE.Mesh(chestLightGeo, accentMaterial);
-        chestLight.position.set(0, 0.1, 0.18);
-        this.torso.add(chestLight);
+        // Chest reactor (like Iron Man)
+        const reactorGeo = new THREE.CircleGeometry(0.15, 16);
+        const reactor = new THREE.Mesh(reactorGeo, glowMaterial);
+        reactor.position.set(0, 0.2, 0.26);
+        this.torso.add(reactor);
 
-        // Add glowing lines on torso
-        const lineGeo = new THREE.BoxGeometry(0.02, 0.6, 0.02);
-        [-0.2, 0.2].forEach(x => {
-            const line = new THREE.Mesh(lineGeo, glowMaterial);
-            line.position.set(x, 0, 0.16);
-            this.torso.add(line);
+        // Chest stripes
+        const stripeGeo = new THREE.BoxGeometry(0.03, 1, 0.03);
+        [-0.3, 0.3].forEach(x => {
+            const stripe = new THREE.Mesh(stripeGeo, accentMaterial);
+            stripe.position.set(x, 0, 0.26);
+            this.torso.add(stripe);
         });
 
-        // Arms
-        const armGeo = new THREE.BoxGeometry(0.15, 0.6, 0.15);
+        // Horizontal chest line
+        const hLineGeo = new THREE.BoxGeometry(0.8, 0.03, 0.03);
+        const hLine = new THREE.Mesh(hLineGeo, glowMaterial);
+        hLine.position.set(0, -0.3, 0.26);
+        this.torso.add(hLine);
+
+        // ========== ARMS ==========
+        const armGeo = new THREE.BoxGeometry(0.2, 0.9, 0.2);
 
         this.leftArm = new THREE.Mesh(armGeo, bodyMaterial);
-        this.leftArm.position.set(-0.45, 1.2, 0);
-        this.leftArm.geometry.translate(0, -0.3, 0); // Pivot from top
+        this.leftArm.position.set(-0.65, 1.7, 0);
+        this.leftArm.geometry.translate(0, -0.45, 0); // Pivot from shoulder
         this.body.add(this.leftArm);
 
         this.rightArm = new THREE.Mesh(armGeo, bodyMaterial);
-        this.rightArm.position.set(0.45, 1.2, 0);
-        this.rightArm.geometry.translate(0, -0.3, 0);
+        this.rightArm.position.set(0.65, 1.7, 0);
+        this.rightArm.geometry.translate(0, -0.45, 0);
         this.body.add(this.rightArm);
 
-        // Arm bands (glowing)
-        const bandGeo = new THREE.BoxGeometry(0.18, 0.05, 0.18);
+        // Arm bands (glowing bracelets)
+        const bandGeo = new THREE.TorusGeometry(0.13, 0.03, 8, 16);
         [this.leftArm, this.rightArm].forEach(arm => {
-            const band = new THREE.Mesh(bandGeo, glowMaterial);
-            band.position.y = -0.2;
-            arm.add(band);
+            const band1 = new THREE.Mesh(bandGeo, glowMaterial);
+            band1.rotation.x = Math.PI / 2;
+            band1.position.y = -0.3;
+            arm.add(band1);
+
+            const band2 = new THREE.Mesh(bandGeo, accentMaterial);
+            band2.rotation.x = Math.PI / 2;
+            band2.position.y = -0.7;
+            arm.add(band2);
         });
 
-        // Legs
-        const legGeo = new THREE.BoxGeometry(0.18, 0.7, 0.18);
+        // Hands
+        const handGeo = new THREE.SphereGeometry(0.12, 8, 8);
+        const handMat = new THREE.MeshBasicMaterial({ color: 0x2a2a4a });
+        [this.leftArm, this.rightArm].forEach(arm => {
+            const hand = new THREE.Mesh(handGeo, handMat);
+            hand.position.y = -0.9;
+            arm.add(hand);
+        });
+
+        // ========== LEGS ==========
+        const legGeo = new THREE.BoxGeometry(0.25, 1.0, 0.25);
 
         this.leftLeg = new THREE.Mesh(legGeo, bodyMaterial);
-        this.leftLeg.position.set(-0.15, 0.55, 0);
-        this.leftLeg.geometry.translate(0, -0.35, 0);
+        this.leftLeg.position.set(-0.25, 0.7, 0);
+        this.leftLeg.geometry.translate(0, -0.5, 0);
         this.body.add(this.leftLeg);
 
         this.rightLeg = new THREE.Mesh(legGeo, bodyMaterial);
-        this.rightLeg.position.set(0.15, 0.55, 0);
-        this.rightLeg.geometry.translate(0, -0.35, 0);
+        this.rightLeg.position.set(0.25, 0.7, 0);
+        this.rightLeg.geometry.translate(0, -0.5, 0);
         this.body.add(this.rightLeg);
 
         // Leg stripes
-        const stripeGeo = new THREE.BoxGeometry(0.02, 0.5, 0.02);
+        const legStripeGeo = new THREE.BoxGeometry(0.03, 0.8, 0.03);
         [this.leftLeg, this.rightLeg].forEach(leg => {
-            const stripe = new THREE.Mesh(stripeGeo, accentMaterial);
-            stripe.position.set(0, -0.1, 0.1);
+            const stripe = new THREE.Mesh(legStripeGeo, accentMaterial);
+            stripe.position.set(0, -0.2, 0.14);
             leg.add(stripe);
         });
 
-        // Feet/boots
-        const bootGeo = new THREE.BoxGeometry(0.2, 0.15, 0.3);
+        // Knee lights
+        const kneeGeo = new THREE.CircleGeometry(0.08, 8);
+        [this.leftLeg, this.rightLeg].forEach(leg => {
+            const knee = new THREE.Mesh(kneeGeo, glowMaterial);
+            knee.position.set(0, -0.3, 0.14);
+            leg.add(knee);
+        });
+
+        // ========== BOOTS ==========
+        const bootGeo = new THREE.BoxGeometry(0.3, 0.2, 0.4);
         const bootMat = new THREE.MeshBasicMaterial({ color: 0x111122 });
 
         const leftBoot = new THREE.Mesh(bootGeo, bootMat);
-        leftBoot.position.set(0, -0.4, 0.05);
+        leftBoot.position.set(0, -0.6, 0.05);
         this.leftLeg.add(leftBoot);
 
+        // Boot glow
+        const bootGlowGeo = new THREE.BoxGeometry(0.32, 0.03, 0.42);
+        const bootGlow = new THREE.Mesh(bootGlowGeo, glowMaterial);
+        bootGlow.position.y = 0.1;
+        leftBoot.add(bootGlow);
+
         const rightBoot = new THREE.Mesh(bootGeo, bootMat);
-        rightBoot.position.set(0, -0.4, 0.05);
+        rightBoot.position.set(0, -0.6, 0.05);
         this.rightLeg.add(rightBoot);
 
-        // Scale up the character
-        this.body.scale.set(1.2, 1.2, 1.2);
+        const bootGlow2 = new THREE.Mesh(bootGlowGeo, glowMaterial);
+        bootGlow2.position.y = 0.1;
+        rightBoot.add(bootGlow2);
+
+        // ========== BACKPACK / JETPACK ==========
+        const backpackGeo = new THREE.BoxGeometry(0.5, 0.7, 0.3);
+        const backpack = new THREE.Mesh(backpackGeo, bodyMaterial);
+        backpack.position.set(0, 0.1, -0.4);
+        this.torso.add(backpack);
+
+        // Thruster lights
+        const thrusterGeo = new THREE.CircleGeometry(0.1, 8);
+        [-0.15, 0.15].forEach(x => {
+            const thruster = new THREE.Mesh(thrusterGeo, accentMaterial);
+            thruster.rotation.y = Math.PI;
+            thruster.position.set(x, -0.2, -0.16);
+            backpack.add(thruster);
+        });
+
+        // Scale up the entire character to be more visible
+        this.body.scale.set(1.8, 1.8, 1.8);
+
+        // Add idle floating animation
+        gsap.to(this.body.position, {
+            y: 0.15,
+            duration: 2,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: -1,
+        });
     }
 
     /**
@@ -148,8 +218,8 @@ export class HumanCharacter {
         if (this.isWalking) return;
         this.isWalking = true;
 
-        const swingAngle = 0.5; // radians
-        const duration = 0.3; // seconds per step
+        const swingAngle = 0.6; // radians
+        const duration = 0.25; // faster walk
 
         this.walkAnimation = gsap.timeline({ repeat: -1 });
 
@@ -162,17 +232,17 @@ export class HumanCharacter {
 
         // Arms swing opposite to legs
         this.walkAnimation
-            .to(this.leftArm.rotation, { x: -swingAngle * 0.7, duration, ease: 'sine.inOut' }, 0)
-            .to(this.rightArm.rotation, { x: swingAngle * 0.7, duration, ease: 'sine.inOut' }, 0)
-            .to(this.leftArm.rotation, { x: swingAngle * 0.7, duration, ease: 'sine.inOut' }, duration)
-            .to(this.rightArm.rotation, { x: -swingAngle * 0.7, duration, ease: 'sine.inOut' }, duration);
+            .to(this.leftArm.rotation, { x: -swingAngle * 0.8, duration, ease: 'sine.inOut' }, 0)
+            .to(this.rightArm.rotation, { x: swingAngle * 0.8, duration, ease: 'sine.inOut' }, 0)
+            .to(this.leftArm.rotation, { x: swingAngle * 0.8, duration, ease: 'sine.inOut' }, duration)
+            .to(this.rightArm.rotation, { x: -swingAngle * 0.8, duration, ease: 'sine.inOut' }, duration);
 
-        // Slight body bounce
+        // Slight head bob
         this.walkAnimation
-            .to(this.body.position, { y: 0.1, duration: duration / 2, ease: 'sine.out' }, 0)
-            .to(this.body.position, { y: 0, duration: duration / 2, ease: 'sine.in' }, duration / 2)
-            .to(this.body.position, { y: 0.1, duration: duration / 2, ease: 'sine.out' }, duration)
-            .to(this.body.position, { y: 0, duration: duration / 2, ease: 'sine.in' }, duration + duration / 2);
+            .to(this.head.rotation, { z: 0.05, duration: duration / 2, ease: 'sine.inOut' }, 0)
+            .to(this.head.rotation, { z: -0.05, duration: duration / 2, ease: 'sine.inOut' }, duration / 2)
+            .to(this.head.rotation, { z: 0.05, duration: duration / 2, ease: 'sine.inOut' }, duration)
+            .to(this.head.rotation, { z: -0.05, duration: duration / 2, ease: 'sine.inOut' }, duration + duration / 2);
     }
 
     /**
@@ -187,31 +257,31 @@ export class HumanCharacter {
             this.walkAnimation = null;
         }
 
-        // Reset limb positions
-        gsap.to(this.leftLeg.rotation, { x: 0, duration: 0.2 });
-        gsap.to(this.rightLeg.rotation, { x: 0, duration: 0.2 });
-        gsap.to(this.leftArm.rotation, { x: 0, duration: 0.2 });
-        gsap.to(this.rightArm.rotation, { x: 0, duration: 0.2 });
-        gsap.to(this.body.position, { y: 0, duration: 0.2 });
+        // Reset limb positions smoothly
+        gsap.to(this.leftLeg.rotation, { x: 0, duration: 0.3 });
+        gsap.to(this.rightLeg.rotation, { x: 0, duration: 0.3 });
+        gsap.to(this.leftArm.rotation, { x: 0, duration: 0.3 });
+        gsap.to(this.rightArm.rotation, { x: 0, duration: 0.3 });
+        gsap.to(this.head.rotation, { z: 0, duration: 0.3 });
     }
 
     /**
-     * Update character position to follow camera
+     * Update character position - NOW VISIBLE IN FRONT OF CAMERA
      */
     public update(cameraPosition: THREE.Vector3, cameraDirection: THREE.Vector3, isMoving: boolean): void {
-        // Position character slightly in front and below camera (third-person view)
-        const offset = cameraDirection.clone().multiplyScalar(-3);
-        offset.y = -2; // Below eye level
+        // Position character IN FRONT of camera (so we can see it)
+        const offset = cameraDirection.clone().multiplyScalar(8); // 8 units in front
+        offset.y = -3; // Below eye level (on ground)
 
         this.targetPosition.copy(cameraPosition).add(offset);
 
         // Smooth follow
-        this.group.position.lerp(this.targetPosition, 0.1);
+        this.group.position.lerp(this.targetPosition, 0.08);
 
-        // Rotate to face movement direction
+        // Rotate to face away from camera (same direction as movement)
         if (isMoving) {
             const targetRotation = Math.atan2(cameraDirection.x, cameraDirection.z);
-            this.currentRotation = this.currentRotation + (targetRotation - this.currentRotation) * 0.1;
+            this.currentRotation = this.currentRotation + (targetRotation - this.currentRotation) * 0.15;
             this.body.rotation.y = this.currentRotation;
             this.startWalking();
         } else {
@@ -233,5 +303,6 @@ export class HumanCharacter {
         if (this.walkAnimation) {
             this.walkAnimation.kill();
         }
+        gsap.killTweensOf(this.body.position);
     }
 }
