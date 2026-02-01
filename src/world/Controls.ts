@@ -115,6 +115,18 @@ export class Controls {
     }
 
     /**
+     * Check if player is moving
+     */
+    public isMoving(): boolean {
+        return (
+            this.keys['KeyW'] || this.keys['ArrowUp'] ||
+            this.keys['KeyS'] || this.keys['ArrowDown'] ||
+            this.keys['KeyA'] || this.keys['ArrowLeft'] ||
+            this.keys['KeyD'] || this.keys['ArrowRight']
+        );
+    }
+
+    /**
      * Dispose event listeners
      */
     public dispose(): void {

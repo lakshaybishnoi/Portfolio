@@ -13,8 +13,10 @@ import { ContactTerminal } from './islands/ContactTerminal';
 import { NeonTrail } from './effects/NeonTrail';
 import { ParticleExplosion } from './effects/ParticleExplosion';
 import { GlitchText } from './effects/GlitchText';
+import { HumanCharacter } from './character/HumanCharacter';
 import { updateLoadingProgress, hideLoadingScreen, showSectionInfo } from './utils/helpers';
 import { SECTIONS, COLORS, PROFILE } from './utils/constants';
+import * as THREE from 'three';
 
 /**
  * Main Portfolio Application
@@ -37,6 +39,9 @@ class Portfolio {
   // Effects
   private neonTrail: NeonTrail;
   private particleExplosion: ParticleExplosion;
+
+  // Character
+  private humanCharacter: HumanCharacter;
   private glitchText: GlitchText;
 
   private clock: number = 0;
@@ -81,6 +86,10 @@ class Portfolio {
     this.neonTrail = new NeonTrail(this.scene.scene, COLORS.NEON_CYAN);
     this.particleExplosion = new ParticleExplosion(this.scene.scene);
     this.glitchText = new GlitchText();
+
+    // Create human character
+    this.humanCharacter = new HumanCharacter();
+    this.scene.add(this.humanCharacter.group);
     updateLoadingProgress(65);
 
     // Create all islands
@@ -215,6 +224,14 @@ class Portfolio {
     // Update particle explosion
     this.particleExplosion.update(delta);
 
+    // Update human character
+    const cameraDir = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.camera.quaternion);
+    this.humanCharacter.update(
+      this.camera.getPosition(),
+      cameraDir,
+      this.controls.isMoving()
+    );
+
     // Update all objects
     this.environment.update(this.clock);
     this.heroIsland.update(this.clock);
@@ -255,6 +272,7 @@ class Portfolio {
     this.neonTrail.dispose();
     this.particleExplosion.dispose();
     this.glitchText.destroy();
+    this.humanCharacter.dispose();
   }
 }
 

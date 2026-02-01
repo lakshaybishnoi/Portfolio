@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    // Set base to your GitHub repo name for GitHub Pages
-    // Change 'portfolio' to your actual repo name
-    base: '/Portfolio/',
+    // For Vercel: no base needed (serves from root)
+    // For GitHub Pages: uncomment and set to repo name
+    // base: '/Portfolio/',
     build: {
         outDir: 'dist',
     },
